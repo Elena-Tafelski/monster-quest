@@ -2,9 +2,11 @@ package com.monsterquest.backend.controller;
 
 import com.monsterquest.backend.entity.Quest;
 import com.monsterquest.backend.repository.QuestRepository;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @CrossOrigin(origins = "http://localhost:5173")
@@ -25,16 +27,20 @@ public class QuestController {
     }
 
     @PostMapping
-    public Quest createQuest(@RequestBody Quest quest) {
+    public Quest createQuest(@Valid @RequestBody Quest quest) {
         return questRepository.save(quest);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Quest> updateQuest(@PathVariable Long id, @RequestBody Quest questDetails) {
+    public ResponseEntity<Quest> updateQuest(@PathVariable Long id, @Valid @RequestBody Quest questDetails) {
         return questRepository.findById(id)
                 .map(quest -> {
                     quest.setTitle(questDetails.getTitle());
+                    quest.setDescription(questDetails.getDescription());
                     quest.setDifficulty(questDetails.getDifficulty());
+                    quest.setDeadline(questDetails.getDeadline());
+                    quest.setRecurrence(questDetails.getRecurrence());
+                    quest.setHardDeadline(questDetails.isHardDeadline());
                     quest.setCompleted(questDetails.isCompleted());
                     return ResponseEntity.ok(questRepository.save(quest));
                 })

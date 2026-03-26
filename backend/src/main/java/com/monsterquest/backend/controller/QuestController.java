@@ -6,7 +6,6 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @CrossOrigin(origins = "http://localhost:5173")
@@ -39,8 +38,8 @@ public class QuestController {
                     quest.setDescription(questDetails.getDescription());
                     quest.setDifficulty(questDetails.getDifficulty());
                     quest.setDeadline(questDetails.getDeadline());
-                    quest.setRecurrence(questDetails.getRecurrence());
                     quest.setHardDeadline(questDetails.isHardDeadline());
+                    quest.setRecurrence(questDetails.getRecurrence());
                     quest.setCompleted(questDetails.isCompleted());
                     return ResponseEntity.ok(questRepository.save(quest));
                 })

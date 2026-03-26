@@ -13,7 +13,7 @@ export interface Quest {
   description?: string;
   difficulty: number;
   deadline?: string;
-  recurrence?: Recurrence;
   hardDeadline?: boolean;
+  recurrence?: Recurrence;
   completed: boolean;
 }

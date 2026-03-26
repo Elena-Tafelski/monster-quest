@@ -40,4 +40,14 @@ public class Quest {
     private Recurrence recurrence = Recurrence.NONE;
 
     private boolean completed = false;
+
+    @AssertTrue(message = "Ohne Datum sind harte Fristen oder Wiederholungen nicht erlaubt!")
+    @SuppressWarnings("unused")
+    public boolean isDeadlineLogicValid() {
+        if (deadline == null) {
+            // Wenn kein Datum da ist, MÜSSEN diese false/NONE sein
+            return !hardDeadline && recurrence == Recurrence.NONE;
+        }
+        return true;
+    }
 }

@@ -48,6 +48,9 @@ public class QuestController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteQuest(@PathVariable Long id) {
+        if (!questRepository.existsById(id)) {
+            return ResponseEntity.notFound().build();
+        }
         questRepository.deleteById(id);
         return ResponseEntity.noContent().build();
     }

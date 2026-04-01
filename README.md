@@ -27,20 +27,55 @@ Gamified task manager and productivity app where users complete quests (tasks) t
 - Docker
 
 ## How to Run Locally
+Run Monster Quest either via **Docker** (easy showcase) or the **Hybrid Way** (faster development).
+
+### Requirements
+* Docker Desktop
+* Java 25 & Node.js 24+ (only for Hybrid Way)
+
+### Setup
+1. Clone or download the repository:
+    ```bash
+    git clone <repo-url>
+    cd monster-quest
+    ```
+2. Environment Variables (optinal):  
+    Create a `.env` file in the root directory. You can use `env.example` as a template.
+
+### Option A: Showcase (Full Docker)
+
+Use this if you just want to see the app running without setting up a local dev environment.
 
 ```bash
-# Clone repo
-git clone <repo-url>
+docker compose down -v
+docker compose up --build
+```
 
-# Database
-docker compose up -d
-# Starts PostgreSQL (5432) and pgAdmin (5050).
+* PostgreSQL: http://localhost:5432
+* Backend API: http://localhost:8080/api
+* Frontend: http://localhost:5173
+* pgAdmin: http://localhost:5050
 
-# Frontend
-cd frontend
-npm install
-npm run dev
+### Option B: Development (Hybrid)
 
-# Backend
-cd backend
-.\mvnw clean spring-boot:run
+Use this for active coding to enjoy Instant Reload.
+
+1. Start the Database  
+   Run `.\dev-start.bat` (Windows) or:
+   ```bash
+   docker compose up -d db pgadmin
+   ```
+
+2. Start the Backend  
+   Open a new terminal in the `backend` folder:
+   ```bash
+   .\mvnw clean spring-boot:run
+   ```
+      
+3. Start the Frontend  
+   Open a new terminal in the `frontend` folder:
+   ```bash
+   npm install
+   npm run dev
+   ```
+      

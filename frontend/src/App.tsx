@@ -1,12 +1,16 @@
-import QuestList from './components/QuestList.tsx';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import QuestList from './features/quests/QuestList.tsx';
+import QuestForm from './features/quests/QuestForm';
 import "./App.css";
 
 function App() {
   return (
-    <div>
-      <h1 className="p-4">Monster Quest</h1>
-      <QuestList />
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<QuestList />} />
+        <Route path="/create" element={<QuestForm />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 

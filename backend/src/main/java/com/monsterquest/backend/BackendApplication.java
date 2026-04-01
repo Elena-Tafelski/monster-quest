@@ -8,11 +8,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class BackendApplication {
 
 	public static void main(String[] args) {
-		// Lädt die .env Datei aus dem Root-Verzeichnis
-		Dotenv dotenv = Dotenv.configure()
-				.directory("..")
-				.ignoreIfMissing()
-				.load();
+		Dotenv dotenv = loadDotenv();
 
 		// Macht die Variablen für Spring verfügbar
 		dotenv.entries().forEach(entry ->
@@ -22,4 +18,16 @@ public class BackendApplication {
 		SpringApplication.run(BackendApplication.class, args);
 	}
 
+	private static Dotenv loadDotenv() {
+		// Prüfen ob .env im aktuellen Verzeichnis existiert
+		if (new java.io.File(".env").exists()) {
+			return Dotenv.configure().directory("./").load();
+		}
+		// Sonst eine Ebene höher (Konsole aus backend/)
+		if (new java.io.File("../.env").exists()) {
+			return Dotenv.configure().directory("../").load();
+		}
+		// Fallback: ignoreIfMissing
+		return Dotenv.configure().ignoreIfMissing().load();
+	}
 }

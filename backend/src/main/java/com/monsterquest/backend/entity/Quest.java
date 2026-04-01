@@ -50,4 +50,12 @@ public class Quest {
         }
         return true;
     }
+
+    @PrePersist
+    @PreUpdate
+    private void sanitize() {
+        if (description != null && description.isBlank()) {
+            description = null;
+        }
+    }
 }

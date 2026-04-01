@@ -1,17 +1,35 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { questService } from './questService';
 import { RecurrenceOptions, type Recurrence } from './questTypes.ts';
+import type { Quest } from './questTypes';
 
-export const QuestForm = () => {
+interface QuestFormProps {
+  initialData?: Quest;
+  onSuccess: () => void;
+  onDelete?: (id: number) => void;
+}
+
+const splitDeadline = (isoString?: string) => {
+  if (!isoString) return { d: '', t: '' };
+  const [d, fullTime] = isoString.split('T');
+  const t = fullTime ? fullTime.substring(0, 5) : '';
+  return { d, t };
+};
+
+export const QuestForm = ({ initialData, onSuccess, onDelete }: QuestFormProps) => {
   const navigate = useNavigate();
-  const [title, setTitle] = useState('');
-  const [difficulty, setDifficulty] = useState(1);
-  const [description, setDescription] = useState('');
-  const [date, setDate] = useState('');
-  const [time, setTime] = useState('');
-  const [hardDeadline, setHardDeadline] = useState(false);
-  const [recurrence, setRecurrence] = useState<Recurrence>(RecurrenceOptions.NONE);
+
+  const { d, t } = splitDeadline(initialData?.deadline);
+
+  const [title, setTitle] = useState(initialData?.title || '');
+  const [difficulty, setDifficulty] = useState(initialData?.difficulty || 1);
+  const [description, setDescription] = useState(initialData?.description || '');
+  const [date, setDate] = useState(d);
+  const [time, setTime] = useState(t);
+  const [hardDeadline, setHardDeadline] = useState(initialData?.hardDeadline || false);
+  const [recurrence, setRecurrence] = useState<Recurrence>(initialData?.recurrence || RecurrenceOptions.NONE);
+
   const [error, setError] = useState<string | null>(null);
 
   const validate = (): boolean => {
@@ -40,41 +58,47 @@ export const QuestForm = () => {
     return true;
   };
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!validate()) return;
+    setIsSubmitting(true);
 
     let deadline = '';
     if (date) {
       deadline = time ? `${date}T${time}:00` : `${date}T00:00:00`;
     }
 
+    const questData = { title, difficulty, description, deadline, hardDeadline, recurrence, completed: initialData?.completed || false };
+
     try {
-      await questService.createQuest({
-        title,
-        difficulty,
-        description,
-        deadline,
-        hardDeadline,
-        recurrence,
-        completed: false,
-      });
-      navigate('/');
+      if (initialData) {
+        await questService.updateQuest(initialData.id, questData);
+      } else {
+        await questService.createQuest(questData);
+      }
+      onSuccess();
+      navigate(initialData ? `/quests/${initialData.id}` : '/');
     } catch (err: any) {
-      // Hier fangen wir die Backend-Validierung ab!
-      const msg = err.response?.data?.message || "Fehler beim Erstellen";
-      setError(msg);
+      setError(err.message || "Ein unerwarteter Fehler ist aufgetreten.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
     <div className="p-6 max-w-lg mx-auto bg-white rounded-2xl shadow-xl mt-10">
-      <button onClick={() => navigate('/')} className="text-blue-500 mb-4 flex items-center gap-1">
+      <Link
+        to="/"
+        className="absolute top-4 left-4 text-blue-500 flex items-center gap-1"
+      >
         ← Abbrechen
-      </button>
+      </Link>
+
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <h2 className="text-xl font-bold">Quest-Schmiede</h2>
+        <h2 className="text-xl font-bold">{initialData ? "Quest anpassen" : "Quest-Schmiede"}</h2>
 
         {error && <div className="bg-red-100 text-red-700 p-2 mb-4 rounded">{error}</div>}
 
@@ -157,9 +181,24 @@ export const QuestForm = () => {
           ))}
         </select>
 
-        <button type="submit" className="bg-green-600 text-white p-3 rounded-xl font-bold hover:bg-green-700">
-          Quest erstellen
+        <button disabled={isSubmitting} type="submit" className="bg-blue-600 text-white p-4 rounded-xl font-bold hover:bg-blue-700 transition shadow-lg mt-4 disabled:opacity-50">
+          {isSubmitting ? "Wird geschmiedet..." : (initialData ? "Speichern" : "Erstellen")}
         </button>
+
+        {/* LÖSCHEN OPTION */}
+        {initialData && onDelete && (
+          <button
+            type="button"
+            onClick={() => {
+              if (window.confirm("Bist du sicher? Das Monster wird spurlos verschwinden!")) {
+                onDelete(initialData.id);
+              }
+            }}
+            className="text-gray-400 hover:text-red-500 text-sm transition mt-2 self-center"
+          >
+            Quest aufgeben & löschen
+          </button>
+        )}
       </form>
     </div>
   );

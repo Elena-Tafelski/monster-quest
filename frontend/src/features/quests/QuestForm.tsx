@@ -5,18 +5,18 @@ import { questService } from './questService';
 import type { Quest } from './questTypes';
 import { RecurrenceOptions, type Recurrence } from './questTypes.ts';
 
-interface QuestFormProps {
-  initialData?: Quest;
-  onSuccess: () => void;
-  onDelete?: (id: number) => void;
-}
-
 const splitDeadline = (isoString?: string) => {
   if (!isoString) return { d: '', t: '' };
   const [d, fullTime] = isoString.split('T');
   const t = fullTime ? fullTime.substring(0, 5) : '';
   return { d, t };
 };
+
+interface QuestFormProps {
+  initialData?: Quest;
+  onSuccess: () => void;
+  onDelete?: (id: number) => void;
+}
 
 export const QuestForm = ({ initialData, onSuccess, onDelete }: QuestFormProps) => {
   const navigate = useNavigate();

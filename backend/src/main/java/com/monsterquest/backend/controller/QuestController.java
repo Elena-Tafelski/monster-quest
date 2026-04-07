@@ -32,18 +32,16 @@ public class QuestController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Quest> updateQuest(@PathVariable Long id, @Valid @RequestBody Quest questDetails) {
-        return questRepository.findById(id)
-                .map(quest -> {
-                    quest.setTitle(questDetails.getTitle());
-                    quest.setDescription(questDetails.getDescription());
-                    quest.setDifficulty(questDetails.getDifficulty());
-                    quest.setDeadline(questDetails.getDeadline());
-                    quest.setHardDeadline(questDetails.isHardDeadline());
-                    quest.setRecurrence(questDetails.getRecurrence());
-                    quest.setCompleted(questDetails.isCompleted());
-                    return ResponseEntity.ok(questRepository.save(quest));
-                })
-                .orElse(ResponseEntity.notFound().build());
+        return questRepository.findById(id).map(quest -> {
+            quest.setTitle(questDetails.getTitle());
+            quest.setDescription(questDetails.getDescription());
+            quest.setDifficulty(questDetails.getDifficulty());
+            quest.setDeadline(questDetails.getDeadline());
+            quest.setHardDeadline(questDetails.isHardDeadline());
+            quest.setRecurrence(questDetails.getRecurrence());
+            quest.setCompleted(questDetails.isCompleted());
+            return ResponseEntity.ok(questRepository.save(quest));
+        }).orElse(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")

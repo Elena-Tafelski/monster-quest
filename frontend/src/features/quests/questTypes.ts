@@ -1,11 +1,11 @@
 export const RecurrenceOptions = {
-  NONE: "NONE",
-  DAILY: "DAILY",
-  WEEKLY: "WEEKLY",
-  MONTHLY: "MONTHLY"
+  NONE: 'NONE',
+  DAILY: 'DAILY',
+  WEEKLY: 'WEEKLY',
+  MONTHLY: 'MONTHLY',
 } as const;
 
-export type Recurrence = typeof RecurrenceOptions[keyof typeof RecurrenceOptions];
+export type Recurrence = (typeof RecurrenceOptions)[keyof typeof RecurrenceOptions];
 
 export interface Quest {
   id: number;

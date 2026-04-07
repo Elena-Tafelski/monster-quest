@@ -1,10 +1,11 @@
 import { useParams, useNavigate, Link } from 'react-router-dom';
+import clsx from 'clsx';
+import { questService } from './questService';
+import type { Quest } from './questTypes';
 import { LoadingSpinner } from '../../components/ui/LoadingSpinner';
 import { StatusMessage } from '../../components/ui/StatusMessage';
-import type { Quest } from './questTypes';
-import monsterImage from '../../assets/monster.png';
 import formatDate from '../../utils/dateFormatter';
-import { questService } from './questService';
+import monsterImage from '../../assets/monster.png';
 
 interface QuestDetailProps {
   quests: Quest[];
@@ -13,18 +14,18 @@ interface QuestDetailProps {
   error: string | null;
 }
 
-const QuestDetail = ({ quests, loading, onReload, error  }: QuestDetailProps) => {
+const QuestDetail = ({ quests, loading, onReload, error }: QuestDetailProps) => {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const quest = quests.find(q => q.id === Number(id));
+  const quest = quests.find((q) => q.id === Number(id));
 
   if (loading) return <LoadingSpinner message="Beschwöre Monster..." />;
 
   // 1. Fall: Es gab einen echten Server-Fehler (aus der App.tsx)
   if (error) {
     return (
-      <StatusMessage 
+      <StatusMessage
         type="connection"
         title="Verbindung verloren?"
         message={error}
@@ -37,7 +38,7 @@ const QuestDetail = ({ quests, loading, onReload, error  }: QuestDetailProps) =>
   // 2. Fall: Daten sind da, aber diese eine Quest-ID gibt es nicht
   if (!quest) {
     return (
-      <StatusMessage 
+      <StatusMessage
         type="error"
         title="Quest verschollen"
         message="Diese Quest existiert nicht (mehr) oder die URL ist falsch."
@@ -49,44 +50,50 @@ const QuestDetail = ({ quests, loading, onReload, error  }: QuestDetailProps) =>
   const handleToggle = async () => {
     try {
       await questService.toggleQuest(quest);
-      onReload(); 
+      onReload();
       navigate('/');
     } catch (err: any) {
-      alert(err.message || "Status konnte nicht geändert werden.");
+      alert(err.message || 'Status konnte nicht geändert werden.');
     }
   };
 
   return (
-    <div className="max-w-lg mx-auto mt-10 bg-white rounded-2xl shadow-xl overflow-hidden">
+    <div className="mx-auto mt-10 max-w-lg overflow-hidden rounded-2xl bg-white shadow-xl">
       {/* Header Bereich mit Monster und Navigation */}
-      <div className="relative bg-gray-100 flex justify-center items-center p-8">
-        <img src={monsterImage} alt="Monster" className="w-48 h-48 object-contain" />
+      <div className="relative flex items-center justify-center bg-gray-100 p-8">
+        <img src={monsterImage} alt="Monster" className="h-48 w-48 object-contain" />
         <Link
           to="/"
-          className="absolute top-4 left-4 bg-white/80 backdrop-blur-sm px-3 py-1 rounded-full text-blue-600 flex items-center gap-1 shadow-sm hover:bg-white transition"
+          className={clsx(
+            'rounded-full bg-white/80 text-blue-600 backdrop-blur-sm',
+            'absolute top-4 left-4 flex items-center gap-1 px-3 py-1 shadow-sm',
+            'transition hover:bg-white'
+          )}
         >
           ← Zurück
         </Link>
         <Link
           to={`/quests/${quest.id}/edit`}
-          className="absolute top-4 right-4 bg-white/80 backdrop-blur-sm rounded-full p-2 shadow-sm hover:bg-white transition"
+          className={clsx(
+            'rounded-full bg-white/80 backdrop-blur-sm',
+            'absolute top-4 right-4 p-2 shadow-sm',
+            'transition hover:bg-white'
+          )}
         >
           ✏️
         </Link>
       </div>
 
       {/* Content Bereich */}
-      <div className="p-6 flex flex-col gap-3">
-        <div className="flex justify-between items-start">
+      <div className="flex flex-col gap-3 p-6">
+        <div className="flex items-start justify-between">
           <h1 className="text-2xl font-bold text-gray-800">{quest.title}</h1>
-          <span className="bg-blue-100 text-blue-700 text-xs font-bold px-2 py-1 rounded">
+          <span className="rounded bg-blue-100 px-2 py-1 text-xs font-bold text-blue-700">
             LVL {quest.difficulty}
           </span>
         </div>
 
-        {quest.description && (
-          <p>{quest.description}</p>
-        )}
+        {quest.description && <p>{quest.description}</p>}
 
         <hr className="my-2 border-gray-100" />
 
@@ -95,7 +102,7 @@ const QuestDetail = ({ quests, loading, onReload, error  }: QuestDetailProps) =>
             <div className="flex items-center gap-2 text-gray-600">
               <span className="text-lg">📅</span>
               <div>
-                <p className="text-[10px] uppercase font-bold text-gray-400">Deadline</p>
+                <p className="text-[10px] font-bold text-gray-400 uppercase">Deadline</p>
                 {formatDate(quest.deadline)}
               </div>
             </div>
@@ -105,7 +112,7 @@ const QuestDetail = ({ quests, loading, onReload, error  }: QuestDetailProps) =>
             <div className="flex items-center gap-2 text-gray-600">
               <span className="text-lg">🔁</span>
               <div>
-                <p className="text-[10px] uppercase font-bold text-gray-400">Wiederholung</p>
+                <p className="text-[10px] font-bold text-gray-400 uppercase">Wiederholung</p>
                 {quest.recurrence}
               </div>
             </div>
@@ -113,20 +120,30 @@ const QuestDetail = ({ quests, loading, onReload, error  }: QuestDetailProps) =>
         </div>
 
         {quest.hardDeadline && (
-          <div className="mt-2 flex items-center gap-2 bg-red-50 text-red-700 p-2 rounded-lg border border-red-100">
+          <div
+            className={clsx(
+              'rounded-lg border border-red-100 bg-red-50 text-red-700',
+              'mt-2 flex items-center gap-2 p-2'
+            )}
+          >
             <span className="animate-pulse">⚠️</span>
-            <span className="text-xs font-bold uppercase tracking-wider">Harte Deadline - Keine Gnade!</span>
+            <span className="text-xs font-bold tracking-wider uppercase">
+              Harte Deadline - Keine Gnade!
+            </span>
           </div>
         )}
 
         {/* Action Button */}
         <button
           onClick={handleToggle}
-          className={`mt-6 w-full p-4 rounded-xl font-bold text-white shadow-lg transform active:scale-95 transition-all ${
+          className={clsx(
+            'rounded-xl font-bold text-white',
+            'mt-6 w-full p-4 shadow-lg',
+            'transform transition-all active:scale-95',
             quest.completed
               ? 'bg-gradient-to-r from-gray-400 to-gray-500 hover:from-gray-500 hover:to-gray-600'
               : 'bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700'
-          }`}
+          )}
         >
           {quest.completed ? '↩️ Quest reaktivieren' : '⚔️ Monster besiegen!'}
         </button>

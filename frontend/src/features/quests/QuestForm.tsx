@@ -1,14 +1,9 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import clsx from 'clsx';
 import { questService } from './questService';
-import { RecurrenceOptions, type Recurrence } from './questTypes.ts';
 import type { Quest } from './questTypes';
-
-interface QuestFormProps {
-  initialData?: Quest;
-  onSuccess: () => void;
-  onDelete?: (id: number) => void;
-}
+import { RecurrenceOptions, type Recurrence } from './questTypes.ts';
 
 const splitDeadline = (isoString?: string) => {
   if (!isoString) return { d: '', t: '' };
@@ -16,6 +11,12 @@ const splitDeadline = (isoString?: string) => {
   const t = fullTime ? fullTime.substring(0, 5) : '';
   return { d, t };
 };
+
+interface QuestFormProps {
+  initialData?: Quest;
+  onSuccess: () => void;
+  onDelete?: (id: number) => void;
+}
 
 export const QuestForm = ({ initialData, onSuccess, onDelete }: QuestFormProps) => {
   const navigate = useNavigate();
@@ -28,20 +29,22 @@ export const QuestForm = ({ initialData, onSuccess, onDelete }: QuestFormProps) 
   const [date, setDate] = useState(d);
   const [time, setTime] = useState(t);
   const [hardDeadline, setHardDeadline] = useState(initialData?.hardDeadline || false);
-  const [recurrence, setRecurrence] = useState<Recurrence>(initialData?.recurrence || RecurrenceOptions.NONE);
+  const [recurrence, setRecurrence] = useState<Recurrence>(
+    initialData?.recurrence || RecurrenceOptions.NONE
+  );
 
   const [error, setError] = useState<string | null>(null);
 
   const validate = (): boolean => {
     // 1. Pflichtfelder
     if (title.trim().length < 3) {
-      setError("Der Titel muss mindestens 3 Zeichen lang sein.");
+      setError('Der Titel muss mindestens 3 Zeichen lang sein.');
       return false;
     }
 
     // 2. Deine Spezial-Logik (Abhängigkeiten)
     if (!date && (time || hardDeadline || recurrence !== 'NONE')) {
-      setError("Uhrzeit/Harte Deadline/Wiederholung geht nur mit einem Datum.");
+      setError('Uhrzeit/Harte Deadline/Wiederholung geht nur mit einem Datum.');
       return false;
     }
 
@@ -50,7 +53,7 @@ export const QuestForm = ({ initialData, onSuccess, onDelete }: QuestFormProps) 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     if (selectedDate.getTime() < today.getTime()) {
-      setError("Das Datum darf nicht in der Vergangenheit liegen.");
+      setError('Das Datum darf nicht in der Vergangenheit liegen.');
       return false;
     }
 
@@ -71,7 +74,15 @@ export const QuestForm = ({ initialData, onSuccess, onDelete }: QuestFormProps) 
       deadline = time ? `${date}T${time}:00` : `${date}T00:00:00`;
     }
 
-    const questData = { title, difficulty, description, deadline, hardDeadline, recurrence, completed: initialData?.completed || false };
+    const questData = {
+      title,
+      difficulty,
+      description,
+      deadline,
+      hardDeadline,
+      recurrence,
+      completed: initialData?.completed || false,
+    };
 
     try {
       if (initialData) {
@@ -82,54 +93,51 @@ export const QuestForm = ({ initialData, onSuccess, onDelete }: QuestFormProps) 
       onSuccess();
       navigate(initialData ? `/quests/${initialData.id}` : '/');
     } catch (err: any) {
-      setError(err.message || "Ein unerwarteter Fehler ist aufgetreten.");
+      setError(err.message || 'Ein unerwarteter Fehler ist aufgetreten.');
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="p-6 max-w-lg mx-auto bg-white rounded-2xl shadow-xl mt-10">
-      <Link
-        to="/"
-        className="absolute top-4 left-4 text-blue-500 flex items-center gap-1"
-      >
+    <div className="mx-auto mt-10 max-w-lg rounded-2xl bg-white p-6 shadow-xl">
+      <Link to="/" className="absolute top-4 left-4 flex items-center gap-1 text-blue-500">
         ← Abbrechen
       </Link>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <h2 className="text-xl font-bold">{initialData ? "Quest anpassen" : "Quest-Schmiede"}</h2>
+        <h2 className="text-xl font-bold">{initialData ? 'Quest anpassen' : 'Quest-Schmiede'}</h2>
 
-        {error && <div className="bg-red-100 text-red-700 p-2 mb-4 rounded">{error}</div>}
+        {error && <div className="mb-4 rounded bg-red-100 p-2 text-red-700">{error}</div>}
 
-        <input 
-          placeholder="Titel (min 3 Zeichen)" 
-          value={title} 
-          onChange={e => setTitle(e.target.value)}
-          className="border p-2 rounded"
+        <input
+          placeholder="Titel (min 3 Zeichen)"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          className="rounded border p-2"
         />
-        
-        <input 
-          type="number" 
-          min="1" 
+
+        <input
+          type="number"
+          min="1"
           max="10"
-          placeholder="Schwierigkeit" 
-          value={difficulty} 
-          onChange={e => setDifficulty(Number(e.target.value))}
-          className="border p-2 rounded"
+          placeholder="Schwierigkeit"
+          value={difficulty}
+          onChange={(e) => setDifficulty(Number(e.target.value))}
+          className="rounded border p-2"
         />
 
-        <textarea 
-          placeholder="Beschreibung (optional)" 
-          value={description} 
-          onChange={e => setDescription(e.target.value)}
-          className="border p-2 rounded"
+        <textarea
+          placeholder="Beschreibung (optional)"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          className="rounded border p-2"
         />
 
-        <input 
-          type="date" 
-          placeholder="Datum (optional)" 
-          value={date} 
+        <input
+          type="date"
+          placeholder="Datum (optional)"
+          value={date}
           onChange={(e) => {
             setDate(e.target.value);
             if (!e.target.value) {
@@ -139,50 +147,65 @@ export const QuestForm = ({ initialData, onSuccess, onDelete }: QuestFormProps) 
               setTime('');
             }
           }}
-          className="border p-2 rounded"
+          className="rounded border p-2"
         />
 
-        <input 
-          type="time" 
+        <input
+          type="time"
           disabled={!date} // Button ist grau, wenn kein Datum gewählt wurde!
-          placeholder="Uhrzeit (optional)" 
-          value={time} 
-          onChange={e => setTime(e.target.value)} 
-          className="border p-2 rounded disabled:bg-gray-100 disabled:text-gray-400"
+          placeholder="Uhrzeit (optional)"
+          value={time}
+          onChange={(e) => setTime(e.target.value)}
+          className="rounded border p-2 disabled:bg-gray-100 disabled:text-gray-400"
         />
 
         <div className="flex items-center justify-between p-1">
           <span className="font-medium text-gray-700">Harte Deadline?</span>
-          
+
           <button
             type="button"
             disabled={!date}
             onClick={() => setHardDeadline(!hardDeadline)}
-            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${
+            className={clsx(
+              'relative inline-flex h-6 w-11 items-center rounded-full',
+              'transition-colors focus:outline-none',
               hardDeadline ? 'bg-green-600' : 'bg-gray-300'
-            }`}
+            )}
           >
             <span
-              className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+              className={clsx(
+                'rounded-full bg-white',
+                'inline-block h-4 w-4',
+                'transform transition-transform',
                 hardDeadline ? 'translate-x-6' : 'translate-x-1'
-              }`}
+              )}
             />
           </button>
         </div>
 
-        <select 
+        <select
           disabled={!date}
-          value={recurrence} 
-          onChange={e => setRecurrence(e.target.value as Recurrence)}
-          className="border p-2 rounded disabled:bg-gray-100 disabled:text-gray-400"
+          value={recurrence}
+          onChange={(e) => setRecurrence(e.target.value as Recurrence)}
+          className="rounded border p-2 disabled:bg-gray-100 disabled:text-gray-400"
         >
-          {Object.values(RecurrenceOptions).map(opt => (
-            <option key={opt as string} value={opt as string}>{opt as string}</option>
+          {Object.values(RecurrenceOptions).map((opt) => (
+            <option key={opt as string} value={opt as string}>
+              {opt as string}
+            </option>
           ))}
         </select>
 
-        <button disabled={isSubmitting} type="submit" className="bg-blue-600 text-white p-4 rounded-xl font-bold hover:bg-blue-700 transition shadow-lg mt-4 disabled:opacity-50">
-          {isSubmitting ? "Wird geschmiedet..." : (initialData ? "Speichern" : "Erstellen")}
+        <button
+          disabled={isSubmitting}
+          type="submit"
+          className={clsx(
+            'rounded-xl bg-blue-600 font-bold text-white',
+            'mt-4 p-4 shadow-lg',
+            'transition hover:bg-blue-700 disabled:opacity-50'
+          )}
+        >
+          {isSubmitting ? 'Wird geschmiedet...' : initialData ? 'Speichern' : 'Erstellen'}
         </button>
 
         {/* LÖSCHEN OPTION */}
@@ -190,11 +213,11 @@ export const QuestForm = ({ initialData, onSuccess, onDelete }: QuestFormProps) 
           <button
             type="button"
             onClick={() => {
-              if (window.confirm("Bist du sicher? Das Monster wird spurlos verschwinden!")) {
+              if (window.confirm('Bist du sicher? Das Monster wird spurlos verschwinden!')) {
                 onDelete(initialData.id);
               }
             }}
-            className="text-gray-400 hover:text-red-500 text-sm transition mt-2 self-center"
+            className="mt-2 self-center text-sm text-gray-400 transition hover:text-red-500"
           >
             Quest aufgeben & löschen
           </button>

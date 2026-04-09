@@ -14,9 +14,9 @@ interface QuestListProps {
 
 const QuestList = ({ quests, loading, onReload, error }: QuestListProps) => {
   return (
-    <div className="mx-auto max-w-4xl">
+    <div className="mx-auto">
       {/* Header Bereich - Immer sichtbar */}
-      <div className="flex items-center gap-4 p-4">
+      <div className="flex items-center gap-4 px-4 pt-6 pb-2">
         <div className="w-10" />
         <h1 className="flex-1 text-center text-2xl font-bold text-gray-800">Quests</h1>
 
@@ -60,7 +60,7 @@ const QuestList = ({ quests, loading, onReload, error }: QuestListProps) => {
 
         {/* Erfolgs-Fall: Die Liste */}
         {!loading && !error && quests.length > 0 && (
-          <div className="flex flex-col flex-wrap justify-center gap-4 md:flex-row">
+          <div className="xs:flex-row flex flex-col flex-wrap justify-center gap-4">
             {quests.map((quest) => (
               <QuestCard key={quest.id} quest={quest} />
             ))}

@@ -14,11 +14,11 @@ export const QuestCard = ({ quest }: QuestCardProps) => {
       to={`/quests/${quest.id}`}
       className={clsx(
         'rounded-md border border-gray-300',
-        'flex items-center gap-2 p-4 shadow-md',
+        'xs:w-[300px] flex items-center gap-2 p-4 shadow-md',
         'transition-shadow hover:shadow-lg'
       )}
     >
-      <img src={monsterImage} alt="Monster" className="w-1/3" />
+      <img src={monsterImage} alt="Monster" className="xs:w-[100px] w-[85px]" />
       <div className="flex flex-1 flex-col items-start">
         <h3 className="text-left">{quest.title}</h3>
         <p>Level: {quest.difficulty}</p>

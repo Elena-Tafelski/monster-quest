@@ -58,7 +58,7 @@ const QuestDetail = ({ quests, loading, onReload, error }: QuestDetailProps) => 
   };
 
   return (
-    <div className="mx-auto mt-10 max-w-lg overflow-hidden rounded-2xl bg-white shadow-xl">
+    <div className="mx-auto w-full max-w-[400px] overflow-hidden rounded-2xl bg-white shadow-xl">
       {/* Header Bereich mit Monster und Navigation */}
       <div className="relative flex items-center justify-center bg-gray-100 p-8">
         <img src={monsterImage} alt="Monster" className="h-48 w-48 object-contain" />
@@ -79,6 +79,7 @@ const QuestDetail = ({ quests, loading, onReload, error }: QuestDetailProps) => 
             'absolute top-4 right-4 p-2 shadow-sm',
             'transition hover:bg-white'
           )}
+          title="Quest bearbeiten"
         >
           ✏️
         </Link>
@@ -86,9 +87,9 @@ const QuestDetail = ({ quests, loading, onReload, error }: QuestDetailProps) => 
 
       {/* Content Bereich */}
       <div className="flex flex-col gap-3 p-6">
-        <div className="flex items-start justify-between">
+        <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold text-gray-800">{quest.title}</h1>
-          <span className="rounded bg-blue-100 px-2 py-1 text-xs font-bold text-blue-700">
+          <span className="rounded bg-blue-100 px-2 py-1 text-xs font-bold whitespace-nowrap text-blue-700">
             LVL {quest.difficulty}
           </span>
         </div>

@@ -100,13 +100,15 @@ export const QuestForm = ({ initialData, onSuccess, onDelete }: QuestFormProps) 
   };
 
   return (
-    <div className="mx-auto mt-10 max-w-lg rounded-2xl bg-white p-6 shadow-xl">
-      <Link to="/" className="absolute top-4 left-4 flex items-center gap-1 text-blue-500">
+    <div className="relative mx-auto mt-10 max-w-lg rounded-2xl bg-white p-6 text-left shadow-xl">
+      <Link to="/" className="text-blue-600">
         ← Abbrechen
       </Link>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <h2 className="text-xl font-bold">{initialData ? 'Quest anpassen' : 'Quest-Schmiede'}</h2>
+        <h2 className="mt-4 text-center text-xl font-bold">
+          {initialData ? 'Quest anpassen' : 'Quest-Schmiede'}
+        </h2>
 
         {error && <div className="mb-4 rounded bg-red-100 p-2 text-red-700">{error}</div>}
 
@@ -134,30 +136,32 @@ export const QuestForm = ({ initialData, onSuccess, onDelete }: QuestFormProps) 
           className="rounded border p-2"
         />
 
-        <input
-          type="date"
-          placeholder="Datum (optional)"
-          value={date}
-          onChange={(e) => {
-            setDate(e.target.value);
-            if (!e.target.value) {
-              // Wenn Datum gelöscht wird, setzen wir Abhängigkeiten zurück
-              setHardDeadline(false);
-              setRecurrence(RecurrenceOptions.NONE);
-              setTime('');
-            }
-          }}
-          className="rounded border p-2"
-        />
+        <div className="flex gap-4">
+          <input
+            type="date"
+            placeholder="Datum (optional)"
+            value={date}
+            onChange={(e) => {
+              setDate(e.target.value);
+              if (!e.target.value) {
+                // Wenn Datum gelöscht wird, setzen wir Abhängigkeiten zurück
+                setHardDeadline(false);
+                setRecurrence(RecurrenceOptions.NONE);
+                setTime('');
+              }
+            }}
+            className="flex-1 rounded border p-2"
+          />
 
-        <input
-          type="time"
-          disabled={!date} // Button ist grau, wenn kein Datum gewählt wurde!
-          placeholder="Uhrzeit (optional)"
-          value={time}
-          onChange={(e) => setTime(e.target.value)}
-          className="rounded border p-2 disabled:bg-gray-100 disabled:text-gray-400"
-        />
+          <input
+            type="time"
+            disabled={!date} // Button ist grau, wenn kein Datum gewählt wurde!
+            placeholder="Uhrzeit (optional)"
+            value={time}
+            onChange={(e) => setTime(e.target.value)}
+            className="flex-1 rounded border p-2 disabled:bg-gray-100 disabled:text-gray-400"
+          />
+        </div>
 
         <div className="flex items-center justify-between p-1">
           <span className="font-medium text-gray-700">Harte Deadline?</span>

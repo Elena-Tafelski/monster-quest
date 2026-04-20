@@ -6,12 +6,14 @@ import monsterImage from '../../assets/monster.png';
 
 interface QuestCardProps {
   quest: Quest;
+  isArchive?: boolean;
 }
 
-export const QuestCard = ({ quest }: QuestCardProps) => {
+export const QuestCard = ({ quest, isArchive }: QuestCardProps) => {
   return (
     <Link
       to={`/quests/${quest.id}`}
+      state={{ from: isArchive ? '/archive' : '/' }}
       className={clsx(
         'rounded-md border border-gray-300',
         'xs:w-[300px] flex items-center gap-2 p-4 shadow-md',

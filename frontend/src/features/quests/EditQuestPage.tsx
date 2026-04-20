@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { questService } from './questService';
 import { QuestForm } from './QuestForm';
 import type { Quest } from './questTypes';
@@ -11,7 +11,10 @@ interface EditQuestPageProps {
 
 const EditQuestPage = ({ quests, onUpdate }: EditQuestPageProps) => {
   const { id } = useParams();
+  const location = useLocation();
   const navigate = useNavigate();
+
+  const previousPath = location.state?.from || '/';
 
   const quest = quests.find((q) => q.id === Number(id));
 
@@ -28,7 +31,7 @@ const EditQuestPage = ({ quests, onUpdate }: EditQuestPageProps) => {
     try {
       await questService.deleteQuest(questId);
       onUpdate(); // Liste in App.tsx aktualisieren
-      navigate('/'); // Nach Löschen zur Liste
+      navigate(previousPath); // Nach Löschen zur Liste
     } catch (err: any) {
       alert(err.message || 'Fehler beim Löschen der Quest.');
     }

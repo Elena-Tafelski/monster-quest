@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useLocation, useNavigate, Link } from 'react-router-dom';
 import clsx from 'clsx';
 import { questService } from './questService';
 import type { Quest } from './questTypes';
@@ -19,7 +19,14 @@ interface QuestFormProps {
 }
 
 export const QuestForm = ({ initialData, onSuccess, onDelete }: QuestFormProps) => {
+  const location = useLocation();
   const navigate = useNavigate();
+
+  // 1. Wohin gehen wir nach dem Speichern/Abbrechen?
+  const backToDetailPath = initialData ? `/quests/${initialData.id}` : '/';
+
+  // 2. Woher kam der User ganz ursprünglich? (z.B. '/archive')
+  const originalOrigin = location.state?.from || '/';
 
   const { d, t } = splitDeadline(initialData?.deadline);
 
@@ -91,7 +98,9 @@ export const QuestForm = ({ initialData, onSuccess, onDelete }: QuestFormProps) 
         await questService.createQuest(questData);
       }
       onSuccess();
-      navigate(initialData ? `/quests/${initialData.id}` : '/');
+      navigate(backToDetailPath, {
+        state: { from: originalOrigin },
+      });
     } catch (err: any) {
       setError(err.message || 'Ein unerwarteter Fehler ist aufgetreten.');
     } finally {
@@ -101,7 +110,7 @@ export const QuestForm = ({ initialData, onSuccess, onDelete }: QuestFormProps) 
 
   return (
     <div className="relative mx-auto mt-10 max-w-lg rounded-2xl bg-white p-6 text-left shadow-xl">
-      <Link to="/" className="text-blue-600">
+      <Link to={backToDetailPath} state={{ from: originalOrigin }} className="text-blue-600">
         ← Abbrechen
       </Link>
 

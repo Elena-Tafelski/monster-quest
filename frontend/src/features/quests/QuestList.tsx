@@ -10,27 +10,45 @@ interface QuestListProps {
   loading: boolean;
   onReload: () => void;
   error: string | null;
+  isArchive?: boolean;
 }
 
-const QuestList = ({ quests, loading, onReload, error }: QuestListProps) => {
+const QuestList = ({ quests, loading, onReload, error, isArchive }: QuestListProps) => {
   return (
     <div className="mx-auto">
       {/* Header Bereich - Immer sichtbar */}
       <div className="flex items-center gap-4 px-4 pt-6 pb-2">
-        <div className="w-10" />
-        <h1 className="flex-1 text-center text-2xl font-bold text-gray-800">Quests</h1>
-
         <Link
-          to="/create"
+          to={isArchive ? '/' : '/archive'}
           className={clsx(
-            'rounded-xl bg-green-600 font-bold text-white',
+            'rounded-xl bg-slate-600 font-bold text-white',
             'flex h-10 w-10 items-center justify-center shadow-md',
-            'transition hover:bg-green-700 active:scale-90'
+            'transition hover:bg-slate-700 active:scale-90'
           )}
-          title="Neue Quest erstellen"
+          title="Quest-Log (Vergangene Quests)"
         >
-          +
+          {isArchive ? '⬅️' : '📜'}
         </Link>
+
+        <h1 className="flex-1 text-center text-2xl font-bold text-gray-800">
+          {isArchive ? 'Quest-Log' : 'Aktive Quests'}
+        </h1>
+
+        {!isArchive && (
+          <Link
+            to="/create"
+            className={clsx(
+              'rounded-xl bg-green-600 font-bold text-white',
+              'flex h-10 w-10 items-center justify-center shadow-md',
+              'transition hover:bg-green-700 active:scale-90'
+            )}
+            title="Neue Quest erstellen"
+          >
+            +
+          </Link>
+        )}
+
+        {isArchive && <div className="w-10" />}
       </div>
 
       {/* Content Bereich - Variabler Inhalt */}
@@ -62,7 +80,7 @@ const QuestList = ({ quests, loading, onReload, error }: QuestListProps) => {
         {!loading && !error && quests.length > 0 && (
           <div className="xs:flex-row flex flex-col flex-wrap justify-center gap-4">
             {quests.map((quest) => (
-              <QuestCard key={quest.id} quest={quest} />
+              <QuestCard key={quest.id} quest={quest} isArchive={isArchive} />
             ))}
           </div>
         )}

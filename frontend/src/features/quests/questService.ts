@@ -20,6 +20,16 @@ api.interceptors.response.use(
 );
 
 export const questService = {
+  async fetchActiveQuests(): Promise<Quest[]> {
+    const response = await api.get<Quest[]>('/quests/active');
+    return response.data;
+  },
+
+  async fetchArchivedQuests(): Promise<Quest[]> {
+    const response = await api.get<Quest[]>('/quests/archive');
+    return response.data;
+  },
+
   async fetchQuests(): Promise<Quest[]> {
     const response = await api.get<Quest[]>('/quests');
     return response.data; // Axios packt die Daten automatisch in .data

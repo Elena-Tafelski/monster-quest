@@ -25,7 +25,7 @@ const QuestList = ({ quests, loading, onReload, error, isArchive }: QuestListPro
             'flex h-10 w-10 items-center justify-center shadow-md',
             'transition hover:bg-slate-700 active:scale-90'
           )}
-          title="Quest-Log (Vergangene Quests)"
+          title={isArchive ? 'Aktive Quests' : 'Quest-Log'}
         >
           {isArchive ? '⬅️' : '📜'}
         </Link>

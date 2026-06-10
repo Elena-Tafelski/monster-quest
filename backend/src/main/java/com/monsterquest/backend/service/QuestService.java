@@ -1,5 +1,7 @@
 package com.monsterquest.backend.service;
 
+import com.monsterquest.backend.dto.QuestCreateRequest;
+import com.monsterquest.backend.dto.QuestUpdateRequest;
 import com.monsterquest.backend.entity.Quest;
 import com.monsterquest.backend.repository.QuestRepository;
 import lombok.RequiredArgsConstructor;
@@ -25,20 +27,30 @@ public class QuestService {
         return questRepository.findAllArchived();
     }
 
-    public Quest createQuest(Quest quest) {
+    public Quest createQuest(QuestCreateRequest dto) {
+        Quest quest = new Quest();
+        // Aus dem DTO in die Entity mappen
+        quest.setTitle(dto.getTitle());
+        quest.setDescription(dto.getDescription());
+        quest.setDifficulty(dto.getDifficulty());
+        quest.setDeadline(dto.getDeadline());
+        quest.setHardDeadline(dto.isHardDeadline());
+        quest.setRecurrence(dto.getRecurrence());
+        quest.setCompleted(false);
+
         return questRepository.save(quest);
     }
 
-    public Optional<Quest> updateQuest(Long id, Quest details) {
+    public Optional<Quest> updateQuest(Long id, QuestUpdateRequest dto) {
         return questRepository.findById(id).map(quest -> {
-            // Mapping der Felder
-            quest.setTitle(details.getTitle());
-            quest.setDescription(details.getDescription());
-            quest.setDifficulty(details.getDifficulty());
-            quest.setDeadline(details.getDeadline());
-            quest.setHardDeadline(details.isHardDeadline());
-            quest.setRecurrence(details.getRecurrence());
-            quest.setCompleted(details.isCompleted());
+            quest.setTitle(dto.getTitle());
+            quest.setDescription(dto.getDescription());
+            quest.setDifficulty(dto.getDifficulty());
+            quest.setDeadline(dto.getDeadline());
+            quest.setHardDeadline(dto.isHardDeadline());
+            quest.setRecurrence(dto.getRecurrence());
+            quest.setCompleted(dto.isCompleted());
+
             return questRepository.save(quest);
         });
     }

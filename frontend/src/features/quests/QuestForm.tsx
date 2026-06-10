@@ -49,19 +49,21 @@ export const QuestForm = ({ initialData, onSuccess, onDelete }: QuestFormProps) 
       return false;
     }
 
-    // 2. Deine Spezial-Logik (Abhängigkeiten)
+    // 2. Abhängigkeiten von Uhrzeit, Hard Deadline und Wiederholung
     if (!date && (time || hardDeadline || recurrence !== 'NONE')) {
       setError('Uhrzeit/Harte Deadline/Wiederholung geht nur mit einem Datum.');
       return false;
     }
 
-    // 3. Logik für Datum in der Vergangenheit
-    const selectedDate = new Date(date);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    if (selectedDate.getTime() < today.getTime()) {
-      setError('Das Datum darf nicht in der Vergangenheit liegen.');
-      return false;
+    // 3. Kein Datum in der Vergangenheit (nur bei Quest-Erstellung)
+    if (!initialData) {
+      const selectedDate = new Date(date);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      if (selectedDate.getTime() < today.getTime()) {
+        setError('Das Datum darf nicht in der Vergangenheit liegen.');
+        return false;
+      }
     }
 
     setError(null);

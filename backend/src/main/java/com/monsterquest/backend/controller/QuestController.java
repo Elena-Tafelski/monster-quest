@@ -1,8 +1,9 @@
 package com.monsterquest.backend.controller;
 
 import com.monsterquest.backend.entity.Quest;
-import com.monsterquest.backend.repository.QuestRepository;
+import com.monsterquest.backend.service.QuestService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,45 +12,42 @@ import java.util.List;
 @CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/api/quests") // Alle Anfragen an /api/quests landen hier
+@RequiredArgsConstructor
 public class QuestController {
 
-    private final QuestRepository questRepository;
-
-    // Spring "injiziert" das Repository automatisch hier rein
-    public QuestController(QuestRepository questRepository) {
-        this.questRepository = questRepository;
-    }
+    private final QuestService questService;
 
     @GetMapping
-    public List<Quest> getAllQuests() {
-        return questRepository.findAll(); // Holt alle Zeilen aus der DB
+    public List<Quest> getAll() {
+        return questService.getAllQuests();
+    }
+
+    @GetMapping("/active")
+    public List<Quest> getActive() {
+        return questService.getActiveQuests();
+    }
+
+    @GetMapping("/archive")
+    public List<Quest> getArchive() {
+        return questService.getArchivedQuests();
     }
 
     @PostMapping
-    public Quest createQuest(@Valid @RequestBody Quest quest) {
-        return questRepository.save(quest);
+    public Quest create(@Valid @RequestBody Quest quest) {
+        return questService.createQuest(quest);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Quest> updateQuest(@PathVariable Long id, @Valid @RequestBody Quest questDetails) {
-        return questRepository.findById(id).map(quest -> {
-            quest.setTitle(questDetails.getTitle());
-            quest.setDescription(questDetails.getDescription());
-            quest.setDifficulty(questDetails.getDifficulty());
-            quest.setDeadline(questDetails.getDeadline());
-            quest.setHardDeadline(questDetails.isHardDeadline());
-            quest.setRecurrence(questDetails.getRecurrence());
-            quest.setCompleted(questDetails.isCompleted());
-            return ResponseEntity.ok(questRepository.save(quest));
-        }).orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<Quest> update(@PathVariable Long id, @Valid @RequestBody Quest quest) {
+        return questService.updateQuest(id, quest)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteQuest(@PathVariable Long id) {
-        if (!questRepository.existsById(id)) {
-            return ResponseEntity.notFound().build();
-        }
-        questRepository.deleteById(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        return questService.deleteQuest(id)
+                ? ResponseEntity.noContent().build()
+                : ResponseEntity.notFound().build();
     }
 }

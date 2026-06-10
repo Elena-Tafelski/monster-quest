@@ -11,7 +11,8 @@ import type { Quest } from './features/quests/questTypes';
 import './App.css';
 
 function App() {
-  const [quests, setQuests] = useState<Quest[]>([]);
+  const [activeQuests, setActiveQuests] = useState<Quest[]>([]);
+  const [archivedQuests, setArchivedQuests] = useState<Quest[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const ERR_LOAD_QUESTS =
@@ -21,9 +22,13 @@ function App() {
   const loadQuests = () => {
     setLoading(true);
     setError(null);
-    questService
-      .fetchQuests()
-      .then(setQuests)
+
+    // Wir feuern beide Anfragen gleichzeitig ab
+    Promise.all([questService.fetchActiveQuests(), questService.fetchArchivedQuests()])
+      .then(([active, archived]) => {
+        setActiveQuests(active);
+        setArchivedQuests(archived);
+      })
       .catch((err: any) => {
         setError(err.message || ERR_LOAD_QUESTS);
       })
@@ -34,25 +39,44 @@ function App() {
     loadQuests();
   }, []);
 
+  const allQuests = [...activeQuests, ...archivedQuests];
+
   return (
     <BrowserRouter>
       <Routes>
         <Route
           path="/"
           element={
-            <QuestList quests={quests} loading={loading} error={error} onReload={loadQuests} />
+            <QuestList
+              quests={activeQuests}
+              loading={loading}
+              error={error}
+              onReload={loadQuests}
+            />
+          }
+        />
+        <Route
+          path="/archive"
+          element={
+            <QuestList
+              quests={archivedQuests}
+              isArchive={true}
+              loading={loading}
+              error={error}
+              onReload={loadQuests}
+            />
           }
         />
         <Route
           path="/quests/:id"
           element={
-            <QuestDetail quests={quests} loading={loading} error={error} onReload={loadQuests} />
+            <QuestDetail quests={allQuests} loading={loading} error={error} onReload={loadQuests} />
           }
         />
         <Route path="/create" element={<QuestForm onSuccess={loadQuests} />} />
         <Route
           path="/quests/:id/edit"
-          element={<EditQuestPage quests={quests} onUpdate={loadQuests} />}
+          element={<EditQuestPage quests={allQuests} onUpdate={loadQuests} />}
         />
       </Routes>
     </BrowserRouter>

@@ -1,4 +1,4 @@
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useLocation, useNavigate, Link } from 'react-router-dom';
 import clsx from 'clsx';
 import { questService } from './questService';
 import type { Quest } from './questTypes';
@@ -16,7 +16,10 @@ interface QuestDetailProps {
 
 const QuestDetail = ({ quests, loading, onReload, error }: QuestDetailProps) => {
   const { id } = useParams();
+  const location = useLocation();
   const navigate = useNavigate();
+
+  const backPath = location.state?.from || '/';
 
   const quest = quests.find((q) => q.id === Number(id));
 
@@ -51,7 +54,7 @@ const QuestDetail = ({ quests, loading, onReload, error }: QuestDetailProps) => 
     try {
       await questService.toggleQuest(quest);
       onReload();
-      navigate('/');
+      navigate(backPath);
     } catch (err: any) {
       alert(err.message || 'Status konnte nicht geändert werden.');
     }
@@ -63,7 +66,7 @@ const QuestDetail = ({ quests, loading, onReload, error }: QuestDetailProps) => 
       <div className="relative flex items-center justify-center bg-gray-100 p-8">
         <img src={monsterImage} alt="Monster" className="h-48 w-48 object-contain" />
         <Link
-          to="/"
+          to={backPath}
           className={clsx(
             'rounded-full bg-white/80 text-blue-600 backdrop-blur-sm',
             'absolute top-4 left-4 flex items-center gap-1 px-3 py-1 shadow-sm',
@@ -74,6 +77,7 @@ const QuestDetail = ({ quests, loading, onReload, error }: QuestDetailProps) => 
         </Link>
         <Link
           to={`/quests/${quest.id}/edit`}
+          state={{ from: backPath }}
           className={clsx(
             'rounded-full bg-white/80 backdrop-blur-sm',
             'absolute top-4 right-4 p-2 shadow-sm',

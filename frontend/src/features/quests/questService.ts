@@ -6,13 +6,38 @@ const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8080/api',
 });
 
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
 // Ein Interceptor fängt Fehler zentral ab
 api.interceptors.response.use(
   (response) => response,
   (error: AxiosError) => {
-    // Falls der Server eine Nachricht schickt, nutzen wir die, ansonsten Fallback
+    if (error.response?.status === 401 || error.response?.status === 403) {
+      // Nur weiterleiten, wenn wir NICHT bereits auf /login oder /register sind
+      const isAuthPage =
+        window.location.pathname === '/login' || window.location.pathname === '/register';
+
+      if (!isAuthPage) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('username');
+        window.location.href = '/login';
+      }
+      return Promise.reject(error);
+    }
+
+    const data = error.response?.data;
+
+    // Prüft erst ob data ein Text ist, sonst ob data.message existiert
     const message =
-      (error.response?.data as any)?.message || 'Die Verbindung zum Server ist fehlgeschlagen.';
+      typeof data === 'string'
+        ? data
+        : (data as any)?.message || 'Die Verbindung zum Server ist fehlgeschlagen.';
 
     // Wir werfen den Fehler mit der sauberen Nachricht weiter
     return Promise.reject({ ...error, message });

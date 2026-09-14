@@ -1,25 +1,30 @@
 package com.monsterquest.backend.security;
 
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 @Component
 public class JwtUtil {
-    // Wir generieren einen sicheren, zufälligen Schlüssel für die Signatur.
-    // WICHTIG: In Produktion sollte dieser Schlüssel aus den application.properties kommen!
-    private final SecretKey secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+
+    private final SecretKey secretKey;
 
     // Das Token ist 24 Stunden gültig (in Millisekunden)
     private final long jwtExpirationMs = 86400000;
 
+    // Holt Secret Key aus application.properties
+    public JwtUtil(@Value("${jwt.secret}") String secret) {
+        this.secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+    }
+
     public String generateToken(String username) {
         return Jwts.builder()
-                .subject(username) // Moderner JJWT 0.12+ Standard (ohne "set")
+                .subject(username)
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
                 .signWith(secretKey) // Signierung mit dem sicheren Schlüssel

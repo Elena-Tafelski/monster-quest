@@ -38,7 +38,7 @@ const EditQuestPage = ({ quests, onUpdate }: EditQuestPageProps) => {
   };
 
   return (
-    <div className="py-10">
+    <div>
       <QuestForm initialData={quest} onSuccess={onUpdate} onDelete={handleDelete} />
     </div>
   );

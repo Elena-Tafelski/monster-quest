@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import clsx from 'clsx';
 import { QuestCard } from './QuestCard';
@@ -14,6 +15,13 @@ interface QuestListProps {
 }
 
 const QuestList = ({ quests, loading, onReload, error, isArchive }: QuestListProps) => {
+  const token = localStorage.getItem('token');
+  const navigate = useNavigate();
+
+  if (!token) {
+    navigate('/login');
+  };
+
   return (
     <div className="mx-auto">
       {/* Header Bereich - Immer sichtbar */}
